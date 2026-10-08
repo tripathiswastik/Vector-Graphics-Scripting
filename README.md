@@ -1,4 +1,4 @@
-# 🎨 Vector Graphics Scripting (Patatap Clone)
+# 🎨 Vector Graphics Scripting — Interactive Audio Visualizer
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Paper.js](https://img.shields.io/badge/Canvas-Paper.js-orange.svg)](http://paperjs.org/)
@@ -6,7 +6,7 @@
 [![Web Audio](https://img.shields.io/badge/Platform-HTML5%20Canvas%20%7C%20WebAudio-purple.svg)](https://github.com/tripathiswastik/Vector-Graphics-Scripting)
 [![Author](https://img.shields.io/badge/Author-Swastik%20Tripathi-blueviolet.svg)](https://github.com/tripathiswastik)
 
-An interactive, kinetic vector graphics sound synthesizer inspired by **Patatap**. Every keystroke triggers unique animations paired with synthesized sound samples mapped dynamically onto an HTML5 canvas.
+An interactive, kinetic vector graphics sound synthesizer. Every keystroke triggers unique animations paired with synthesized sound samples mapped dynamically onto an HTML5 canvas.
 
 ---
 
