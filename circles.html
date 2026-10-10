@@ -19,7 +19,7 @@
 		var isMuted = false;
 		var shapes = [];
 		var count = 0;
-		var MAX_SHAPES = 60;
+		var MAX_SHAPES = 35;
 
 		// Cached DOM elements
 		var counterEl = null;
@@ -88,13 +88,13 @@
 			var targetPoint = point || (Point.random() * new Point(view.size.width, view.size.height));
 			var radius = Math.min(view.size.width, view.size.height) * 0.38;
 
-			// Cap concurrent shapes to prevent memory spikes
+			// Strict shape cap to guarantee 60fps on all devices
 			if (shapes.length >= MAX_SHAPES) {
 				var oldest = shapes.shift();
 				if (oldest) oldest.remove();
 			}
 
-			// Procedural visual variants
+			// Clean, efficient geometric shapes
 			var shape;
 			var variant = (Math.random() * 3) | 0;
 			if (variant === 0) {
@@ -110,7 +110,7 @@
 			}
 
 			shape.fillColor = config.color;
-			shape.blendMode = 'screen';
+			shape.blendMode = 'normal'; // High performance: avoids multi-pass screen compositing
 			shape.opacity = 0.95;
 
 			playSound(key);
@@ -127,6 +127,8 @@
 		}
 
 		function onKeyDown(event) {
+			// Ignore OS rapid key repeat to prevent animation queue floods
+			if (event.event && event.event.repeat) return;
 			var k = event.key ? event.key.toLowerCase() : '';
 			if (keyConfig[k]) {
 				triggerShape(k);
@@ -138,19 +140,20 @@
 			triggerShape(randomKey, event.point);
 		}
 
-		// Single-pass O(n) in-place array compaction (eliminates splice overhead)
+		// Single-pass O(n) in-place array compaction with earlier cutoff
 		function onFrame(event) {
 			var activeCount = 0;
 			var total = shapes.length;
 
 			for (var i = 0; i < total; i++) {
 				var s = shapes[i];
-				s.scale(0.92);
+				s.scale(0.91);
 				s.rotate(3.5);
-				s.opacity *= 0.96;
+				s.opacity *= 0.95;
 				s.fillColor.hue += 1.5;
 
-				if (s.area >= 1 && s.opacity >= 0.02) {
+				// Purge as soon as barely visible to keep render queue lean
+				if (s.area >= 1.5 && s.opacity >= 0.03) {
 					shapes[activeCount++] = s;
 				} else {
 					s.remove();
