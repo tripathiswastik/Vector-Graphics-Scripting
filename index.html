@@ -11,9 +11,13 @@
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
 
-	<!-- Minified Libraries (CDN with fallback) -->
+	<!-- Libraries (CDN with fallback) -->
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/paper.js/0.12.18/paper-full.min.js"></script>
-	<script>window.paper || document.write('<script src="paper-full.js"><\/script>');</script>
+	<script>
+		if (!window.paper) {
+			document.write('<script src="paper-full.js"><\/script>');
+		}
+	</script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.4/howler.min.js"></script>
 
 	<!-- Styles -->
@@ -26,15 +30,12 @@
 		var count = 0;
 		var MAX_SHAPES = 35;
 
-		// Object Pool for zero-GC shape recycling
-		var shapePool = [];
-
-		// Cached DOM elements & state flags
+		// Cached DOM elements
 		var counterEl = null;
 		var hintEl = null;
-		var hasFadedOut = false;
+		var hintHidden = false;
 
-		// Configuration map: colors & sound file paths
+		// Config map: colors & sound file paths
 		var keyConfig = {
 			q: { sound: 'sounds/bubbles.mp3', color: '#1abc9c' },
 			w: { sound: 'sounds/clay.mp3', color: '#2ecc71' },
@@ -67,35 +68,27 @@
 		var KEY_LIST = Object.keys(keyConfig);
 		var KEY_COUNT = KEY_LIST.length;
 
-		// Sound pool with background non-blocking idle preloading
+		// Sound pool cache
 		var soundPool = {};
 
-		function preloadNextSound(queueIndex) {
-			if (queueIndex >= KEY_COUNT) return;
-			var key = KEY_LIST[queueIndex];
-			if (!soundPool[key]) {
-				soundPool[key] = new Howl({
-					src: [keyConfig[key].sound],
-					preload: true,
-					html5: false
-				});
-			}
-			var nextStep = function() { preloadNextSound(queueIndex + 1); };
-			if (window.requestIdleCallback) {
-				window.requestIdleCallback(nextStep);
-			} else {
-				setTimeout(nextStep, 16);
-			}
+		function initAudio() {
+			Object.keys(keyConfig).forEach(function(key) {
+				var item = keyConfig[key];
+				if (!item) return;
+				if (!soundPool[key]) {
+					soundPool[key] = new Howl({
+						src: [item.sound],
+						preload: true,
+						html5: false,
+						volume: 0.8
+					});
+				}
+			});
 		}
-
-		window.addEventListener('DOMContentLoaded', function() {
-			counterEl = document.getElementById('count-val');
-			hintEl = document.getElementById('instruction');
-			preloadNextSound(0);
-		});
 
 		function playSound(key) {
 			if (isMuted) return;
+
 			var item = keyConfig[key];
 			if (!item) return;
 
@@ -103,121 +96,103 @@
 				soundPool[key] = new Howl({
 					src: [item.sound],
 					preload: true,
-					html5: false
+					html5: false,
+					volume: 0.8
 				});
 			}
+
 			soundPool[key].play();
 		}
 
-		// Object pool helper: retrieves recycled shape or instantiates once
-		function getPooledShape(variant, targetPoint, radius) {
-			for (var i = shapePool.length - 1; i >= 0; i--) {
-				var pooled = shapePool[i];
-				if (pooled.shapeType === variant) {
-					shapePool.splice(i, 1);
-					pooled.position = targetPoint;
-					pooled.opacity = 0.95;
-					pooled.scaling = 1;
-					pooled.rotation = 0;
-					pooled.visible = true;
-					return pooled;
-				}
-			}
-
-			// Instantiate only when pool is exhausted
-			var shape;
-			if (variant === 0) {
-				shape = new Path.Circle(targetPoint, radius);
-			} else if (variant === 1) {
-				shape = new Path.RegularPolygon(targetPoint, 4, radius * 0.85);
-			} else {
-				shape = new Path.Rectangle({
-					point: targetPoint - new Point(radius * 0.7, radius * 0.7),
-					size: [radius * 1.4, radius * 1.4],
-					radius: 12
-				});
-			}
-			shape.shapeType = variant;
-			shape.blendMode = 'normal';
-			return shape;
-		}
-
-		function releaseShape(s) {
-			s.visible = false;
-			if (shapePool.length < MAX_SHAPES) {
-				shapePool.push(s);
-			} else {
-				s.remove();
-			}
-		}
-
-		function triggerShape(key, point, explicitConfig) {
-			var config = explicitConfig || keyConfig[key];
+		function triggerShape(key, point) {
+			var config = keyConfig[key];
 			if (!config) return;
 
 			var targetPoint = point || (Point.random() * new Point(view.size.width, view.size.height));
 			var radius = Math.min(view.size.width, view.size.height) * 0.38;
 
-			// Cap concurrent shapes to maintain 60 FPS
+			// Strict shape cap to guarantee smooth animation
 			if (shapes.length >= MAX_SHAPES) {
 				var oldest = shapes.shift();
-				if (oldest) releaseShape(oldest);
+				if (oldest) oldest.remove();
 			}
 
-			// Adaptive complexity: use light circles when concurrency is high
-			var variant = (shapes.length > 18) ? 0 : ((Math.random() * 3) | 0);
-			var shape = getPooledShape(variant, targetPoint, radius);
+			var shape;
+			if (shapes.length > 18) {
+				shape = new Path.Circle(targetPoint, radius);
+			} else {
+				var variant = (Math.random() * 3) | 0;
+				if (variant === 0) {
+					shape = new Path.Circle(targetPoint, radius);
+				} else if (variant === 1) {
+					shape = new Path.RegularPolygon(targetPoint, 3 + ((Math.random() * 3) | 0), radius * 0.85);
+				} else {
+					shape = new Path.Rectangle({
+						point: targetPoint - new Point(radius * 0.7, radius * 0.7),
+						size: [radius * 1.4, radius * 1.4],
+						radius: 12
+					});
+				}
+			}
+
 			shape.fillColor = config.color;
+			shape.blendMode = 'normal';
+			shape.opacity = 0.95;
 
 			playSound(key);
 			shapes.push(shape);
 			count++;
 
-			// Fast cached DOM update without redundant class queries
+			// Fast cached DOM update
 			if (counterEl) {
 				counterEl.textContent = count;
 			}
-			if (!hasFadedOut && hintEl) {
+
+			if (hintEl && !hintHidden) {
 				hintEl.classList.add('fade-out');
-				hasFadedOut = true;
+				hintHidden = true;
 			}
 		}
 
 		function onKeyDown(event) {
+			// Ignore OS rapid key repeat to prevent animation queue floods
 			if (event.event && event.event.repeat) return;
 			var k = event.key ? event.key.toLowerCase() : '';
-			var config = keyConfig[k];
-			if (config) {
-				triggerShape(k, null, config);
+			if (keyConfig[k]) {
+				triggerShape(k);
 			}
 		}
 
 		function onMouseDown(event) {
 			var randomKey = KEY_LIST[(Math.random() * KEY_COUNT) | 0];
-			triggerShape(randomKey, event.point, keyConfig[randomKey]);
+			triggerShape(randomKey, event.point);
 		}
 
-		// Single-pass O(n) in-place array compaction with object pooling & throttled hue math
+		// Reduced per-frame work: hue update every 3rd frame instead of every frame
 		function onFrame(event) {
 			var activeCount = 0;
 			var total = shapes.length;
-			var updateHue = (event.count & 3) === 0; // Throttled: runs every 4th frame (75% less overhead)
+			var updateHue = (event.count % 3 === 0);
 
 			for (var i = 0; i < total; i++) {
 				var s = shapes[i];
+				if (!s) continue;
+
 				s.scale(0.91);
 				s.rotate(3.5);
 				s.opacity *= 0.95;
-				if (updateHue) {
-					s.fillColor.hue += 6.0;
+
+				if (updateHue && s.fillColor) {
+					s.fillColor.hue = (s.fillColor.hue + 2.4) % 360;
 				}
 
 				if (s.area >= 1.5 && s.opacity >= 0.03) {
 					shapes[activeCount++] = s;
 				} else {
-					releaseShape(s);
+					s.remove();
 				}
 			}
+
 			shapes.length = activeCount;
 		}
 
@@ -230,6 +205,13 @@
 				btn.innerHTML = isMuted ? '🔇 Muted' : '🔊 Sound On';
 			}
 		};
+
+		window.addEventListener('DOMContentLoaded', function() {
+			counterEl = document.getElementById('count-val');
+			hintEl = document.getElementById('instruction');
+
+			initAudio();
+		});
 	</script>
 </head>
 <body>
