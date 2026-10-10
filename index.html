@@ -94,19 +94,23 @@
 				if (oldest) oldest.remove();
 			}
 
-			// Clean, efficient geometric shapes
+			// Adaptive path complexity: favor ultra-light circles when concurrency is high
 			var shape;
-			var variant = (Math.random() * 3) | 0;
-			if (variant === 0) {
+			if (shapes.length > 18) {
 				shape = new Path.Circle(targetPoint, radius);
-			} else if (variant === 1) {
-				shape = new Path.RegularPolygon(targetPoint, 3 + ((Math.random() * 4) | 0), radius * 0.85);
 			} else {
-				shape = new Path.Rectangle({
-					point: targetPoint - new Point(radius * 0.7, radius * 0.7),
-					size: [radius * 1.4, radius * 1.4],
-					radius: 20
-				});
+				var variant = (Math.random() * 3) | 0;
+				if (variant === 0) {
+					shape = new Path.Circle(targetPoint, radius);
+				} else if (variant === 1) {
+					shape = new Path.RegularPolygon(targetPoint, 3 + ((Math.random() * 3) | 0), radius * 0.85);
+				} else {
+					shape = new Path.Rectangle({
+						point: targetPoint - new Point(radius * 0.7, radius * 0.7),
+						size: [radius * 1.4, radius * 1.4],
+						radius: 12
+					});
+				}
 			}
 
 			shape.fillColor = config.color;
@@ -140,17 +144,20 @@
 			triggerShape(randomKey, event.point);
 		}
 
-		// Single-pass O(n) in-place array compaction with earlier cutoff
+		// Single-pass O(n) in-place array compaction with earlier cutoff and throttled color math
 		function onFrame(event) {
 			var activeCount = 0;
 			var total = shapes.length;
+			var updateHue = (event.count & 1) === 0;
 
 			for (var i = 0; i < total; i++) {
 				var s = shapes[i];
 				s.scale(0.91);
 				s.rotate(3.5);
 				s.opacity *= 0.95;
-				s.fillColor.hue += 1.5;
+				if (updateHue) {
+					s.fillColor.hue += 3.0; // Halves color recalculation overhead
+				}
 
 				// Purge as soon as barely visible to keep render queue lean
 				if (s.area >= 1.5 && s.opacity >= 0.03) {
