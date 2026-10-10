@@ -1,5 +1,6 @@
 # 🎨 Vector Graphics Scripting — Interactive Audio Visualizer
 
+[![Live Demo](https://img.shields.io/badge/Demo-GitHub%20Pages-brightgreen.svg)](https://tripathiswastik.github.io/Vector-Graphics-Scripting/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Paper.js](https://img.shields.io/badge/Canvas-Paper.js-orange.svg)](http://paperjs.org/)
 [![Howler.js](https://img.shields.io/badge/Audio-Howler.js%20v2-green.svg)](https://howlerjs.com/)
@@ -7,6 +8,8 @@
 [![Author](https://img.shields.io/badge/Author-Swastik%20Tripathi-blueviolet.svg)](https://github.com/tripathiswastik)
 
 An interactive, kinetic vector graphics sound synthesizer. Every keystroke triggers unique animations paired with synthesized sound samples mapped dynamically onto an HTML5 canvas.
+
+> 🌐 **Experience the Live Web Demo:** **[https://tripathiswastik.github.io/Vector-Graphics-Scripting/](https://tripathiswastik.github.io/Vector-Graphics-Scripting/)** (No installation required)
 
 ---
 
@@ -68,14 +71,39 @@ Then visit `http://localhost:8000` in your browser.
 
 ---
 
-## 🎮 Keyboard Controls
+## 🎮 Complete Keystroke & Audio Synthesizer Keymap
 
-| Key Range | Sound FX Category | Visual Aesthetic |
-| :---: | :---: | :---: |
-| `Q` - `P` | Bubbles, Melodic Chimes, Dotted Spirals | Turquoise, Emerald, Amethyst |
-| `A` - `L` | Percussion, Pinwheels, Prisms, Strikes | Goldenrod, Vermilion, Coral |
-| `Z` - `M` | Ambient Swells, UFOs, Zig-Zags, Timers | Lavender, Cyan, Deep Navy |
-| `Mouse Click` | Generates a randomized sound & animation | Dynamic responsive sizing |
+Every key on your keyboard (`A` through `Z`) triggers a dedicated audio sample accompanied by a procedurally animated geometry and tailored color scheme:
+
+| Key | Sound Sample | Color Accent | Shape & Kinetic Behavior |
+| :---: | :--- | :--- | :--- |
+| **`Q`** | `bubbles.mp3` | `#1abc9c` (Turquoise) | Expanding radial circle with soft pulse |
+| **`W`** | `clay.mp3` | `#2ecc71` (Emerald) | Rotating square with decelerating angular velocity |
+| **`E`** | `confetti.mp3` | `#3498db` (Sky Blue) | Multi-point confetti burst explosion |
+| **`R`** | `corona.mp3` | `#9b59b6` (Amethyst) | Corona starburst polygon with radial spikes |
+| **`T`** | `dotted-spiral.mp3` | `#34495e` (Midnight) | Concentric dashed spiral path |
+| **`Y`** | `flash-1.mp3` | `#16a085` (Sea Green) | Screen flash vector expansion |
+| **`U`** | `flash-2.mp3` | `#27ae60` (Forest Green)| Rapid double-pulse polygon |
+| **`I`** | `flash-3.mp3` | `#2980b9` (Cobalt) | High-velocity fading ring |
+| **`O`** | `glimmer.mp3` | `#8e44ad` (Purple) | Shimmering dodecagon with scale fade |
+| **`P`** | `moon.mp3` | `#2c3e50` (Dark Slate) | Crescent orbit transformation |
+| **`A`** | `pinwheel.mp3` | `#f1c40f` (Sunflower) | High-speed spinning pinwheel rotor |
+| **`S`** | `piston-1.mp3` | `#e67e22` (Carrot) | Vertical reciprocating piston column |
+| **`D`** | `piston-2.mp3` | `#e74c3c` (Alizarin) | Dual-offset hydraulic piston motion |
+| **`F`** | `prism-1.mp3` | `#95a5a6` (Concrete) | Triangular optical prism refracting light |
+| **`G`** | `prism-2.mp3` | `#f39c12` (Orange) | Hexagonal dispersion prism |
+| **`H`** | `prism-3.mp3` | `#d35400` (Rust) | Octagonal chromatic prism |
+| **`J`** | `splits.mp3` | `#1abc9c` (Turquoise) | Bifurcating twin-orbit vectors |
+| **`K`** | `squiggle.mp3` | `#2ecc71` (Emerald) | Sine-wave oscillating squiggle line |
+| **`L`** | `strike.mp3` | `#3498db` (Sky Blue) | Kinetic lightning vector strike |
+| **`Z`** | `suspension.mp3` | `#9b59b6` (Amethyst) | Damped spring harmonic bounce |
+| **`X`** | `timer.mp3` | `#34495e` (Midnight) | Clockwise sweeping radar sweep |
+| **`C`** | `ufo.mp3` | `#16a085` (Sea Green) | Floating hovering disc trajectory |
+| **`V`** | `veil.mp3` | `#27ae60` (Forest Green)| Expanding transcluent geometric veil |
+| **`B`** | `wipe.mp3` | `#2980b9` (Cobalt) | Linear canvas horizon wipe |
+| **`N`** | `zig-zag.mp3` | `#8e44ad` (Purple) | Angular saw-tooth vector cascade |
+| **`M`** | `moon.mp3` | `#2c3e50` (Dark Slate) | Deep lunar eclipse fade |
+| **🖱️ Click / Tap** | *Random Sample* | *Random Palette* | Spawns random vector at mouse/touch coordinate |
 
 ---
 
