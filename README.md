@@ -15,7 +15,13 @@ An interactive, kinetic vector graphics sound synthesizer. Every keystroke trigg
 - **🎹 Interactive Key Matrix (`A` to `Z`)**: 26 distinct, harmonious sound samples paired with procedurally generated geometric vector graphics.
 - **🖱️ Mouse & Touch Screen Support**: Click or tap anywhere to generate random vector animations and trigger sounds on mobile and desktop.
 - **🔄 Generative Geometric Morphing**: Alternate between rotating circles, rounded rectangles, and regular polygons with hue-shifting color animations.
-- **⚡ Performance & Memory Optimization**: Implemented garbage collection inside Paper.js's `onFrame` loop to destroy invisible paths, preventing DOM and memory leaks.
+- **⚡ High-Performance Architecture**:
+  - **CDN Caching with Fallback**: Minified Paper.js and Howler.js loaded via CDN with local offline fallbacks.
+  - **Bounded Shape Concurrency (`MAX_SHAPES = 60`)**: Caps memory spikes and prevents performance degradation under rapid key strikes.
+  - **In-Place Array Compaction**: Single-pass $O(n)$ array pruning inside `onFrame` without $O(n^2)$ array-splicing overhead.
+  - **Lazy Sound Allocation**: Creates and decodes audio instances only when a key is first triggered, reducing initialization load to zero.
+  - **Cached DOM References**: Eliminates recurring DOM queries inside trigger loops.
+  - **Bitwise Random Indexing**: Fast bitwise operations for random mouse/touch key selection.
 - **🔊 Modern Audio Engine**: Powered by **Howler.js 2.2** with Web Audio API support and a dedicated sound mute toggle HUD.
 - **💎 Glassmorphic Minimal HUD**: Sleek, non-intrusive UI overlay with an interactive trigger counter and responsive design.
 

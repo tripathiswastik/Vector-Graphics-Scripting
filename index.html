@@ -4,11 +4,12 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Vector Graphics Audio Visualizer</title>
-	<meta name="description" content="Interactive kinetic vector audio-visual synthesizer. Built using Paper.js and Howler.js.">
+	<meta name="description" content="High-performance interactive kinetic vector audio-visual synthesizer. Built using Paper.js and Howler.js.">
 
-	<!-- Libraries -->
-	<script type="text/javascript" src="paper-full.js"></script>
-	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
+	<!-- Libraries (CDN with local fallback) -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/paper.js/0.12.18/paper-full.min.js"></script>
+	<script>window.paper || document.write('<script src="paper-full.js"><\/script>');</script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.4/howler.min.js"></script>
 
 	<!-- Styles -->
 	<link rel="stylesheet" type="text/css" href="circles.css">
@@ -18,51 +19,88 @@
 		var isMuted = false;
 		var shapes = [];
 		var count = 0;
+		var MAX_SHAPES = 60;
 
-		var keyData = {
-			q: { sound: new Howl({ src: ['sounds/bubbles.mp3'] }), color: '#1abc9c' },
-			w: { sound: new Howl({ src: ['sounds/clay.mp3'] }), color: '#2ecc71' },
-			e: { sound: new Howl({ src: ['sounds/confetti.mp3'] }), color: '#3498db' },
-			r: { sound: new Howl({ src: ['sounds/corona.mp3'] }), color: '#9b59b6' },
-			t: { sound: new Howl({ src: ['sounds/dotted-spiral.mp3'] }), color: '#34495e' },
-			y: { sound: new Howl({ src: ['sounds/flash-1.mp3'] }), color: '#16a085' },
-			u: { sound: new Howl({ src: ['sounds/flash-2.mp3'] }), color: '#27ae60' },
-			i: { sound: new Howl({ src: ['sounds/flash-3.mp3'] }), color: '#2980b9' },
-			o: { sound: new Howl({ src: ['sounds/glimmer.mp3'] }), color: '#8e44ad' },
-			p: { sound: new Howl({ src: ['sounds/moon.mp3'] }), color: '#2c3e50' },
-			a: { sound: new Howl({ src: ['sounds/pinwheel.mp3'] }), color: '#f1c40f' },
-			s: { sound: new Howl({ src: ['sounds/piston-1.mp3'] }), color: '#e67e22' },
-			d: { sound: new Howl({ src: ['sounds/piston-2.mp3'] }), color: '#e74c3c' },
-			f: { sound: new Howl({ src: ['sounds/prism-1.mp3'] }), color: '#95a5a6' },
-			g: { sound: new Howl({ src: ['sounds/prism-2.mp3'] }), color: '#f39c12' },
-			h: { sound: new Howl({ src: ['sounds/prism-3.mp3'] }), color: '#d35400' },
-			j: { sound: new Howl({ src: ['sounds/splits.mp3'] }), color: '#1abc9c' },
-			k: { sound: new Howl({ src: ['sounds/squiggle.mp3'] }), color: '#2ecc71' },
-			l: { sound: new Howl({ src: ['sounds/strike.mp3'] }), color: '#3498db' },
-			z: { sound: new Howl({ src: ['sounds/suspension.mp3'] }), color: '#9b59b6' },
-			x: { sound: new Howl({ src: ['sounds/timer.mp3'] }), color: '#34495e' },
-			c: { sound: new Howl({ src: ['sounds/ufo.mp3'] }), color: '#16a085' },
-			v: { sound: new Howl({ src: ['sounds/veil.mp3'] }), color: '#27ae60' },
-			b: { sound: new Howl({ src: ['sounds/wipe.mp3'] }), color: '#2980b9' },
-			n: { sound: new Howl({ src: ['sounds/zig-zag.mp3'] }), color: '#8e44ad' },
-			m: { sound: new Howl({ src: ['sounds/moon.mp3'] }), color: '#e056fd' }
+		// Cached DOM elements
+		var counterEl = null;
+		var hintEl = null;
+
+		window.addEventListener('DOMContentLoaded', function() {
+			counterEl = document.getElementById('count-val');
+			hintEl = document.getElementById('instruction');
+		});
+
+		// Configuration map: colors & sound file paths
+		var keyConfig = {
+			q: { sound: 'sounds/bubbles.mp3', color: '#1abc9c' },
+			w: { sound: 'sounds/clay.mp3', color: '#2ecc71' },
+			e: { sound: 'sounds/confetti.mp3', color: '#3498db' },
+			r: { sound: 'sounds/corona.mp3', color: '#9b59b6' },
+			t: { sound: 'sounds/dotted-spiral.mp3', color: '#34495e' },
+			y: { sound: 'sounds/flash-1.mp3', color: '#16a085' },
+			u: { sound: 'sounds/flash-2.mp3', color: '#27ae60' },
+			i: { sound: 'sounds/flash-3.mp3', color: '#2980b9' },
+			o: { sound: 'sounds/glimmer.mp3', color: '#8e44ad' },
+			p: { sound: 'sounds/moon.mp3', color: '#2c3e50' },
+			a: { sound: 'sounds/pinwheel.mp3', color: '#f1c40f' },
+			s: { sound: 'sounds/piston-1.mp3', color: '#e67e22' },
+			d: { sound: 'sounds/piston-2.mp3', color: '#e74c3c' },
+			f: { sound: 'sounds/prism-1.mp3', color: '#95a5a6' },
+			g: { sound: 'sounds/prism-2.mp3', color: '#f39c12' },
+			h: { sound: 'sounds/prism-3.mp3', color: '#d35400' },
+			j: { sound: 'sounds/splits.mp3', color: '#1abc9c' },
+			k: { sound: 'sounds/squiggle.mp3', color: '#2ecc71' },
+			l: { sound: 'sounds/strike.mp3', color: '#3498db' },
+			z: { sound: 'sounds/suspension.mp3', color: '#9b59b6' },
+			x: { sound: 'sounds/timer.mp3', color: '#34495e' },
+			c: { sound: 'sounds/ufo.mp3', color: '#16a085' },
+			v: { sound: 'sounds/veil.mp3', color: '#27ae60' },
+			b: { sound: 'sounds/wipe.mp3', color: '#2980b9' },
+			n: { sound: 'sounds/zig-zag.mp3', color: '#8e44ad' },
+			m: { sound: 'sounds/piston-3.mp3', color: '#e056fd' }
 		};
 
-		var keyList = Object.keys(keyData);
+		var KEY_LIST = Object.keys(keyConfig);
+		var KEY_COUNT = KEY_LIST.length;
+
+		// Lazy sound pool cache (allocated only upon first key interaction)
+		var soundPool = {};
+
+		function playSound(key) {
+			if (isMuted) return;
+			var item = keyConfig[key];
+			if (!item) return;
+
+			if (!soundPool[key]) {
+				soundPool[key] = new Howl({
+					src: [item.sound],
+					preload: true,
+					html5: false
+				});
+			}
+			soundPool[key].play();
+		}
 
 		function triggerShape(key, point) {
-			if (!keyData[key]) return;
+			var config = keyConfig[key];
+			if (!config) return;
 
 			var targetPoint = point || (Point.random() * new Point(view.size.width, view.size.height));
 			var radius = Math.min(view.size.width, view.size.height) * 0.38;
 
-			// Alternate between circles and polygon shapes for visual richness
+			// Cap concurrent shapes to prevent memory spikes
+			if (shapes.length >= MAX_SHAPES) {
+				var oldest = shapes.shift();
+				if (oldest) oldest.remove();
+			}
+
+			// Procedural visual variants
 			var shape;
-			var variant = Math.floor(Math.random() * 3);
+			var variant = (Math.random() * 3) | 0;
 			if (variant === 0) {
 				shape = new Path.Circle(targetPoint, radius);
 			} else if (variant === 1) {
-				shape = new Path.RegularPolygon(targetPoint, 3 + Math.floor(Math.random() * 4), radius * 0.85);
+				shape = new Path.RegularPolygon(targetPoint, 3 + ((Math.random() * 4) | 0), radius * 0.85);
 			} else {
 				shape = new Path.Rectangle({
 					point: targetPoint - new Point(radius * 0.7, radius * 0.7),
@@ -71,55 +109,54 @@
 				});
 			}
 
-			shape.fillColor = keyData[key].color;
+			shape.fillColor = config.color;
 			shape.blendMode = 'screen';
 			shape.opacity = 0.95;
 
-			if (!isMuted && keyData[key].sound) {
-				keyData[key].sound.play();
-			}
-
+			playSound(key);
 			shapes.push(shape);
 			count++;
 
-			// Update counter
-			var counterEl = document.getElementById('count-val');
+			// Fast cached DOM update
 			if (counterEl) {
-				counterEl.innerText = count;
+				counterEl.textContent = count;
 			}
-
-			// Dismiss initial instruction
-			var hint = document.getElementById('instruction');
-			if (hint && !hint.classList.contains('fade-out')) {
-				hint.classList.add('fade-out');
+			if (hintEl && !hintEl.classList.contains('fade-out')) {
+				hintEl.classList.add('fade-out');
 			}
 		}
 
 		function onKeyDown(event) {
 			var k = event.key ? event.key.toLowerCase() : '';
-			if (keyData[k]) {
+			if (keyConfig[k]) {
 				triggerShape(k);
 			}
 		}
 
 		function onMouseDown(event) {
-			var randomKey = keyList[Math.floor(Math.random() * keyList.length)];
+			var randomKey = KEY_LIST[(Math.random() * KEY_COUNT) | 0];
 			triggerShape(randomKey, event.point);
 		}
 
+		// Single-pass O(n) in-place array compaction (eliminates splice overhead)
 		function onFrame(event) {
-			for (var i = shapes.length - 1; i >= 0; i--) {
-				shapes[i].fillColor.hue += 1.5;
-				shapes[i].scale(0.92);
-				shapes[i].rotate(3.5);
-				shapes[i].opacity *= 0.96;
+			var activeCount = 0;
+			var total = shapes.length;
 
-				// Garbage collection: remove shape once shrunk to prevent memory leak
-				if (shapes[i].area < 1 || shapes[i].opacity < 0.02) {
-					shapes[i].remove();
-					shapes.splice(i, 1);
+			for (var i = 0; i < total; i++) {
+				var s = shapes[i];
+				s.scale(0.92);
+				s.rotate(3.5);
+				s.opacity *= 0.96;
+				s.fillColor.hue += 1.5;
+
+				if (s.area >= 1 && s.opacity >= 0.02) {
+					shapes[activeCount++] = s;
+				} else {
+					s.remove();
 				}
 			}
+			shapes.length = activeCount;
 		}
 
 		// Sound mute toggle hook
