@@ -1,5 +1,8 @@
 /**
- * Modern Key Configuration & Lazy Audio Pool for Vector Graphics Scripting
+ * Vector Graphics Scripting - Key & Audio Configuration Pool
+ * Platform: HTML5 Canvas, Web Audio API (Howler.js 2.2), Paper.js 0.12
+ * Purpose: Key-to-sound and animated color vector mapping for interactive audio-visual synthesizer.
+ * Runs-in: Modern web browsers (Desktop keyboard & Mobile touch events), GitHub Pages
  */
 var keyConfig = {
 	q: { sound: 'sounds/bubbles.mp3', color: '#1abc9c' },
