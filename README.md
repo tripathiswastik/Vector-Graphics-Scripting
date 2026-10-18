@@ -124,3 +124,9 @@ Every key on your keyboard (`A` through `Z`) triggers a dedicated audio sample a
 ## 📄 License
 
 This project is open-source and available under the [MIT License](LICENSE).
+
+---
+
+## 🏷️ Repository Metadata & Topic Tags
+- **Core Topics**: `vector-graphics` `audio-visualizer` `paperjs` `howlerjs` `canvas` `html5`
+- **Governance**: Follows [Antigravity AI Rules](file:///d:/ag-ai/.agents/rules/antigravity-rules.md) and [Multi-Agent SDLC Contracts](file:///d:/ag-ai/.agents/rules/multi-agent-prompts.md).
