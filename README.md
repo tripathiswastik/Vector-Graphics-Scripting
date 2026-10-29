@@ -143,5 +143,6 @@ This project is open-source and available under the [MIT License](LICENSE).
 ---
 
 ## 🏷️ Repository Metadata & Topic Tags
-- **Core Topics**: `vector-graphics` `audio-visualizer` `paperjs` `howlerjs` `canvas` `html5`
+- **About Description**: Interactive kinetic vector graphics audio visualizer and synthesizer built with Paper.js, Howler.js, and HTML5 WebAudio.
+- **Core Topics**: `vector-graphics` `audio-visualizer` `paperjs` `howlerjs` `canvas` `webaudio` `html5` `interactive-audio`
 - **Governance**: Follows [Antigravity AI Rules](file:///d:/ag-ai/.agents/rules/antigravity-rules.md) and [Multi-Agent SDLC Contracts](file:///d:/ag-ai/.agents/rules/multi-agent-prompts.md).
