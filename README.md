@@ -71,6 +71,21 @@ Then visit `http://localhost:8000` in your browser.
 
 ---
 
+## 🌐 Live Preview & GitHub Pages Activation
+
+This project is optimized for direct browser exploration with zero dependencies:
+
+- **Live URL**: [https://tripathiswastik.github.io/Vector-Graphics-Scripting/](https://tripathiswastik.github.io/Vector-Graphics-Scripting/)
+- **Automated Deployment**: GitHub Actions workflow [`.github/workflows/deploy-pages.yml`](.github/workflows/deploy-pages.yml) builds and deploys artifacts automatically upon push.
+- **Enabling in GitHub Settings**:
+  1. Open repository **Settings** on GitHub.
+  2. Navigate to **Pages** in the left sidebar.
+  3. Under **Build and deployment > Source**, select **GitHub Actions**.
+  *(Alternatively, select **Deploy from a branch** with branch `master` and folder `/ (root)`)*.
+
+
+---
+
 ## 🎮 Complete Keystroke & Audio Synthesizer Keymap
 
 Every key on your keyboard (`A` through `Z`) triggers a dedicated audio sample accompanied by a procedurally animated geometry and tailored color scheme:
