@@ -158,11 +158,21 @@
 			shapes.push(shape);
 			count++;
 
-			// Fast cached DOM update
+			// Resilient DOM update
+			updateHUD();
+		}
+
+		function updateHUD() {
+			if (!counterEl) {
+				counterEl = document.getElementById('count-val');
+			}
 			if (counterEl) {
 				counterEl.textContent = count;
 			}
 
+			if (!hintEl) {
+				hintEl = document.getElementById('instruction');
+			}
 			if (hintEl && !hintHidden) {
 				hintEl.classList.add('fade-out');
 				hintHidden = true;
@@ -221,12 +231,21 @@
 			}
 		};
 
-		window.addEventListener('DOMContentLoaded', function() {
-			counterEl = document.getElementById('count-val');
-			hintEl = document.getElementById('instruction');
-
+		function initHUD() {
+			if (!counterEl) {
+				counterEl = document.getElementById('count-val');
+			}
+			if (!hintEl) {
+				hintEl = document.getElementById('instruction');
+			}
 			initAudio();
-		});
+		}
+
+		if (document.readyState === 'loading') {
+			window.addEventListener('DOMContentLoaded', initHUD);
+		} else {
+			initHUD();
+		}
 	</script>
 </head>
 <body>
