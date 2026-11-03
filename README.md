@@ -132,7 +132,7 @@ Every key on your keyboard (`A` through `Z`) triggers a dedicated audio sample a
 
 ## 👤 Author
 
-- **Swastik Tripathi** — [GitHub (@tripathiswastik)](https://github.com/tripathiswastik)
+- **Swastik Tripathi** — [GitHub (@tripathiswastik)](https://github.com/tripathiswastik) • [LinkedIn](https://www.linkedin.com/in/swastik-tripathi-52333511a/)
 
 ---
 
